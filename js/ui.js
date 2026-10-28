@@ -122,7 +122,7 @@ window.FA = window.FA || {};
       '<div class="fitem__body">' +
         '<div class="fitem__meta">' + tags + '</div>' +
         '<div class="fitem__tex" title="' + FA.escapeHtml(it.tex) + '">' + FA.escapeHtml(it.tex) + '</div>' +
-        '<div class="fitem__preview">' + FA.renderMath(it.tex, false) + '</div>' +
+        '<div class="fitem__preview">' + FA.renderMath(it.tex, true) + '</div>' +
       '</div>' +
       '<div class="fitem__act">' +
         '<button class="btn btn--tiny" data-act="edit">编辑</button>' +
