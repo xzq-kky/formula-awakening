@@ -182,6 +182,7 @@ window.FA = window.FA || {};
     el.origin.textContent = '来源：' + sourceLabel(item.source) +
       (item.page ? ' · 第 ' + item.page + ' 页' : '') +
       (item.elementId ? ' · ' + item.elementId : '');
+    if (FA.ui && FA.ui.markCurrent && item.index) FA.ui.markCurrent(item.index);
     updatePreview();
     el.input.focus();
     el.input.setSelectionRange(item.tex.length, item.tex.length);
