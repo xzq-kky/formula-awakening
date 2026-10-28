@@ -65,8 +65,8 @@ window.FA = window.FA || {};
       ['job_id', data.job_id || '—'],
       ['schema', data.schema_version || '—'],
       ['x_request_id', result.requestId || '—'],
-      ['解析耗时', (result.elapsedMs / 1000).toFixed(2) + ' 秒'],
-      ['调用时间', FA.formatTime(result.finishedAt)]
+      ['解析耗时', result.elapsedMs ? (result.elapsedMs / 1000).toFixed(2) + ' 秒' : '—'],
+      ['调用时间', result.finishedAt ? FA.formatTime(result.finishedAt) : '—']
     ];
 
     el.docInfo.innerHTML = rows.map(function (r) {
