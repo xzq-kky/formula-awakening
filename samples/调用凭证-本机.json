@@ -1,0 +1,90 @@
+{
+  "project": "公式觉醒工作台 Formula Awakening Workbench",
+  "competition": "TextIn xParse「文档觉醒」AI 应用创新赛 · 实用价值赛道",
+  "service": "TextIn xParse 智能文档解析（parse/sync）",
+  "endpoint": "https://api.textin.com/api/v1/xparse/parse/sync",
+  "exportedAt": "2026-10-28 15:50:58",
+  "totalCalls": 2,
+  "records": [
+    {
+      "time": 1793173663455,
+      "filename": "高等数学-期中试卷.pdf",
+      "fileSize": 72052,
+      "pageCount": 2,
+      "successCount": 2,
+      "fileId": "108d24ea794646e2b3455ed7aaa85a23",
+      "jobId": "aa3638a949e144c8b1de57b655ae6a37",
+      "requestId": "16ad0913b83cb393d2ef0ab91956c3a1",
+      "schemaVersion": "1.4.0",
+      "formulaCount": 31,
+      "formulaBySource": {
+        "total": 31,
+        "display": 4,
+        "inline": 27,
+        "table": 0,
+        "fallback": 31,
+        "pages": 2
+      },
+      "elapsedMs": 7797,
+      "endpoint": "https://api.textin.com/api/v1/xparse/parse/sync",
+      "requestConfig": {
+        "capabilities": {
+          "include_hierarchy": true,
+          "include_inline_objects": true,
+          "include_table_structure": true,
+          "include_char_details": false,
+          "include_image_data": false,
+          "title_tree": true,
+          "pages": true,
+          "table_view": "html"
+        },
+        "config": {
+          "engine_params": {
+            "formula_level": 2
+          }
+        }
+      },
+      "engine": "TextIn xParse · parse/sync"
+    },
+    {
+      "time": 1793173191754,
+      "filename": "高等数学-期中试卷.pdf",
+      "fileSize": 72052,
+      "pageCount": 2,
+      "successCount": 2,
+      "fileId": "44bccfe2edb7429eb9bc1edcb6651c15",
+      "jobId": "f0b900d7f17f45e399fb39835f0c84ec",
+      "requestId": "cd03232c1674473f05f06962ea28e64b",
+      "schemaVersion": "1.4.0",
+      "formulaCount": 31,
+      "formulaBySource": {
+        "total": 31,
+        "display": 4,
+        "inline": 27,
+        "table": 0,
+        "fallback": 31,
+        "pages": 2
+      },
+      "elapsedMs": 12858,
+      "endpoint": "https://api.textin.com/api/v1/xparse/parse/sync",
+      "requestConfig": {
+        "capabilities": {
+          "include_hierarchy": true,
+          "include_inline_objects": true,
+          "include_table_structure": true,
+          "include_char_details": false,
+          "include_image_data": false,
+          "title_tree": true,
+          "pages": true,
+          "table_view": "html"
+        },
+        "config": {
+          "engine_params": {
+            "formula_level": 2
+          }
+        }
+      },
+      "engine": "TextIn xParse · parse/sync"
+    }
+  ]
+}
