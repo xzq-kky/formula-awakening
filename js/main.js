@@ -37,6 +37,7 @@ window.FA = window.FA || {};
     FA.ui.init();
     FA.editor.init();
 
+    bindTheme();
     bindUpload();
     bindTabs();
     bindSettings();
@@ -50,6 +51,31 @@ window.FA = window.FA || {};
     if (!FA.xparse.hasKey()) {
       FA.ui.showAlert('info', '还没有连接 TextIn xParse。点击右上角「API 设置」填入 app_id 与 secret_code 即可开始；密钥只保存在本机浏览器。');
     }
+  }
+
+  /* ---------------- 深浅色主题 ---------------- */
+  function applyTheme(mode, persist) {
+    var isLight = mode === 'light';
+    document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
+    var btn = document.getElementById('btnTheme');
+    if (btn) {
+      var tip = isLight ? '切换到深色模式' : '切换到浅色模式';
+      btn.title = tip;
+      btn.setAttribute('aria-label', tip);
+      btn.setAttribute('aria-pressed', isLight ? 'true' : 'false');
+    }
+    if (persist) FA.lsSet(FA.LS.THEME, isLight ? 'light' : 'dark');
+  }
+
+  function bindTheme() {
+    applyTheme(FA.lsGet(FA.LS.THEME, 'dark') === 'light' ? 'light' : 'dark');
+    var btn = document.getElementById('btnTheme');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      applyTheme(isLight ? 'dark' : 'light', true);
+      FA.toast(isLight ? '已切换到深色模式' : '已切换到浅色模式');
+    });
   }
 
   /* ---------------- 上传 ---------------- */
