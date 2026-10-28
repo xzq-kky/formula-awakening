@@ -12,7 +12,8 @@ window.FA = window.FA || {};
     APP_ID: 'fa_textin_app_id_v1',
     SECRET: 'fa_textin_secret_v1',
     LIB: 'fa_formula_lib_v1',
-    PROOFS: 'fa_proofs_v1'
+    PROOFS: 'fa_proofs_v1',
+    THEME: 'fa_theme_v1'
   };
 
   /* ---------------- 本地存储 ---------------- */
