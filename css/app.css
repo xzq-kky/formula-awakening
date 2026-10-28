@@ -26,6 +26,10 @@
   --radius: 14px;
   --radius-sm: 9px;
   --shadow: 0 18px 40px -20px rgba(0, 0, 0, .8);
+  --shadow-hover: 0 20px 44px -22px rgba(0, 0, 0, .9);
+
+  /* 结果区滚动高度：随视口自适应，避免 768 高的笔记本上被截断 */
+  --pane-h: clamp(320px, calc(100vh - 330px), 720px);
 
   --mono: "JetBrains Mono", "Cascadia Code", Consolas, "SF Mono", Menlo, monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -144,17 +148,22 @@ code { font-family: var(--mono); font-size: .88em; background: var(--surface-3);
 }
 .metric {
   background: var(--bg);
-  padding: 13px 18px;
+  padding: 12px clamp(12px, 1.4vw, 20px);
   display: flex;
   flex-direction: column;
   gap: 1px;
+  min-width: 0;
 }
 .metric__num {
   font-family: var(--mono);
-  font-size: 20px;
+  font-size: clamp(18px, 1.5vw, 21px);
   font-weight: 650;
   color: var(--text);
   line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .metric__num--accent { color: var(--wake); }
 .metric__label { font-size: 11px; color: var(--muted); letter-spacing: .04em; }
@@ -162,13 +171,18 @@ code { font-family: var(--mono); font-size: .88em; background: var(--surface-3);
 /* ---------------- 工作区布局 ---------------- */
 .workspace {
   display: grid;
-  grid-template-columns: 330px minmax(0, 1fr) 400px;
+  grid-template-columns: clamp(272px, 23vw, 336px) minmax(0, 1fr) clamp(340px, 29vw, 416px);
   gap: 16px;
   padding: 18px 22px 34px;
   align-items: start;
 }
 
 .col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+/* 宽屏时编辑器随页面滚动常驻，改公式时不用来回滚 */
+@media (min-width: 1281px) {
+  .col--editor { position: sticky; top: 84px; }
+}
 
 /* ---------------- 卡片 ---------------- */
 .card {
@@ -183,14 +197,15 @@ code { font-family: var(--mono); font-size: .88em; background: var(--surface-3);
 
 .card__head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px 10px;
+  flex-wrap: wrap;
   margin-bottom: 13px;
 }
 .card--flush > .card__head { padding: 15px 16px 0; }
 .card__head h2 { font-size: 13.5px; letter-spacing: .02em; }
-.hint { font-size: 11.5px; color: var(--muted); }
+.hint { font-size: 11.5px; color: var(--muted); min-width: 0; }
 
 .prose { font-size: 12.8px; color: var(--text-2); line-height: 1.68; }
 .prose strong { color: var(--wake); font-weight: 600; }
@@ -251,6 +266,8 @@ code { font-family: var(--mono); font-size: .88em; background: var(--surface-3);
   padding: 9px 9px 0;
   border-bottom: 1px solid var(--line);
   background: var(--surface-2);
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 .tab {
   font-family: inherit;
@@ -264,6 +281,8 @@ code { font-family: var(--mono); font-size: .88em; background: var(--surface-3);
   cursor: pointer;
   border-radius: 6px 6px 0 0;
   transition: .16s;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 .tab b { font-family: var(--mono); font-size: 11px; color: var(--wake); margin-left: 3px; }
 .tab:hover { color: var(--text-2); }
@@ -295,7 +314,7 @@ code { font-family: var(--mono); font-size: .88em; background: var(--surface-3);
 .toolbar input[type="search"]:focus, .toolbar select:focus { border-color: var(--accent); }
 
 /* ---------------- 公式列表 ---------------- */
-.formula-list { padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 9px; max-height: 62vh; overflow-y: auto; }
+.formula-list { padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 9px; max-height: var(--pane-h); overflow-y: auto; }
 
 .fitem {
   border: 1px solid var(--line);
@@ -308,7 +327,18 @@ code { font-family: var(--mono); font-size: .88em; background: var(--surface-3);
   align-items: center;
   transition: .16s;
 }
-.fitem:hover { border-color: rgba(245, 165, 36, .5); background: var(--wake-soft); }
+.fitem:hover {
+  border-color: rgba(245, 165, 36, .5);
+  background: var(--wake-soft);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+}
+.fitem.is-current {
+  border-color: rgba(245, 165, 36, .62);
+  background: var(--wake-soft);
+  box-shadow: inset 3px 0 0 var(--wake);
+}
+.fitem.is-current .fitem__idx { color: var(--wake); }
 
 .fitem__idx {
   font-family: var(--mono);
@@ -358,13 +388,13 @@ code { font-family: var(--mono); font-size: .88em; background: var(--surface-3);
 .fitem__act { display: flex; flex-direction: column; gap: 5px; }
 
 /* ---------------- 空态 ---------------- */
-.empty { padding: 52px 26px; text-align: center; color: var(--muted); }
+.empty { padding: clamp(30px, 5vh, 52px) 24px; text-align: center; color: var(--muted); }
 .empty__art { font-family: var(--mono); font-size: 40px; color: var(--line); margin-bottom: 8px; }
 .empty h3 { font-size: 14px; color: var(--text-2); margin-bottom: 5px; }
 .empty p { font-size: 12.5px; margin: 0; }
 
 /* ---------------- Markdown 视图 ---------------- */
-.markdown { padding: 20px 24px 28px; font-size: 13.5px; line-height: 1.78; color: var(--text-2); max-height: 64vh; overflow-y: auto; }
+.markdown { padding: 20px 24px 28px; font-size: 13.5px; line-height: 1.78; color: var(--text-2); max-height: var(--pane-h); overflow-y: auto; }
 .markdown h1, .markdown h2, .markdown h3, .markdown h4 { color: var(--text); margin: 1.3em 0 .55em; line-height: 1.35; }
 .markdown h1 { font-size: 19px; }
 .markdown h2 { font-size: 16.5px; }
@@ -380,7 +410,7 @@ code { font-family: var(--mono); font-size: .88em; background: var(--surface-3);
 .markdown .katex-display { margin: .8em 0; }
 
 /* ---------------- 结构树 ---------------- */
-.element-tree { padding: 14px 16px; max-height: 64vh; overflow-y: auto; font-size: 12.3px; }
+.element-tree { padding: 14px 16px; max-height: var(--pane-h); overflow-y: auto; font-size: 12.3px; }
 .eitem { display: grid; grid-template-columns: 62px 92px minmax(0, 1fr); gap: 9px; padding: 6px 0; border-bottom: 1px dashed var(--line-soft); align-items: baseline; }
 .eitem__page { font-family: var(--mono); font-size: 11px; color: var(--muted); }
 .eitem__type { font-size: 10.5px; padding: 1px 6px; border-radius: 5px; background: var(--surface-3); color: var(--text-2); text-align: center; }
@@ -391,10 +421,11 @@ code { font-family: var(--mono); font-size: .88em; background: var(--surface-3);
 
 /* ---------------- 编辑器 ---------------- */
 .editor { display: flex; flex-direction: column; }
-.mathtool { display: flex; flex-wrap: wrap; gap: 5px; padding: 4px 16px 12px; }
+.mathtool { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px 16px 11px; }
 .mathtool button {
   font-family: var(--mono);
-  font-size: 11.5px;
+  font-size: 11px;
+  line-height: 1.2;
   padding: 4px 8px;
   border-radius: 6px;
   border: 1px solid var(--line);
@@ -440,12 +471,13 @@ code { font-family: var(--mono); font-size: .88em; background: var(--surface-3);
 .preview__placeholder { color: var(--muted); font-size: 12.5px; }
 .preview__error { color: var(--danger); font-family: var(--mono); font-size: 11.5px; }
 
-.editor__actions { display: flex; flex-wrap: wrap; gap: 7px; padding: 13px 16px 0; }
+.editor__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 13px 16px 0; }
+.editor__actions .btn { width: 100%; padding: 9px 10px; }
 
 .lib { padding: 15px 16px 16px; margin-top: 14px; border-top: 1px solid var(--line-soft); }
 .lib__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
 .lib__head h3 { font-size: 12.5px; color: var(--text-2); }
-.lib__list { display: flex; flex-wrap: wrap; gap: 6px; }
+.lib__list { display: flex; flex-wrap: wrap; gap: 6px; max-height: 128px; overflow-y: auto; }
 .lib__item {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 4px 9px;
@@ -543,11 +575,52 @@ code { font-family: var(--mono); font-size: .88em; background: var(--surface-3);
 .toast.is-show { opacity: 1; transform: translate(-50%, 0); }
 .toast[data-type="error"] { background: var(--danger); color: #1a0705; box-shadow: 0 10px 30px -12px rgba(241, 101, 91, .9); }
 
+/* ---------------- 键盘可达性 ---------------- */
+.btn:focus-visible,
+.tab:focus-visible,
+.mathtool button:focus-visible,
+.lib__item:focus-visible,
+.modal__close:focus-visible,
+.dropzone:focus-within {
+  outline: 2px solid var(--wake);
+  outline-offset: 2px;
+}
+.dropzone:focus-within { border-color: var(--wake); }
+
+/* ---------------- 滚动条 ---------------- */
+html { scrollbar-color: #2b3c52 transparent; scrollbar-width: thin; }
+.formula-list::-webkit-scrollbar,
+.markdown::-webkit-scrollbar,
+.element-tree::-webkit-scrollbar,
+.proof-list::-webkit-scrollbar,
+.tabs::-webkit-scrollbar { width: 10px; height: 8px; }
+.formula-list::-webkit-scrollbar-thumb,
+.markdown::-webkit-scrollbar-thumb,
+.element-tree::-webkit-scrollbar-thumb,
+.proof-list::-webkit-scrollbar-thumb {
+  background: #2b3c52;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  border-radius: 99px;
+}
+.formula-list::-webkit-scrollbar-thumb:hover,
+.markdown::-webkit-scrollbar-thumb:hover,
+.element-tree::-webkit-scrollbar-thumb:hover,
+.proof-list::-webkit-scrollbar-thumb:hover { background: #3c5470; background-clip: content-box; }
+.tabs::-webkit-scrollbar { display: none; }
+
 /* ---------------- 响应式 ---------------- */
+@media (max-width: 1440px) {
+  .workspace { padding: 16px 18px 30px; gap: 14px; }
+  .topbar { padding: 12px 18px; }
+}
+
 @media (max-width: 1280px) {
   .workspace { grid-template-columns: 300px minmax(0, 1fr); }
   .col--editor { grid-column: 1 / -1; }
   .metrics { grid-template-columns: repeat(3, 1fr); }
+  .formula-list, .markdown, .element-tree { max-height: 56vh; }
+  .topbar__right { gap: 7px; }
 }
 
 @media (max-width: 860px) {
@@ -561,5 +634,15 @@ code { font-family: var(--mono); font-size: .88em; background: var(--surface-3);
   .formula-list, .markdown, .element-tree { max-height: none; }
   .fitem { grid-template-columns: 26px minmax(0, 1fr); }
   .fitem__act { grid-column: 1 / -1; flex-direction: row; }
-  .fitem__act .btn { flex: 1; }
+  .fitem__act .btn { flex: 1; padding: 7px 10px; }
+  .footer { padding: 16px 14px 26px; }
+}
+
+@media (max-width: 560px) {
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+  .metric { padding: 9px 12px; }
+  .topbar__logo { width: 34px; height: 34px; font-size: 19px; border-radius: 9px; }
+  .topbar__titles h1 { font-size: 15px; }
+  .card { padding: 14px; }
+  .markdown { padding: 16px 16px 22px; }
 }
