@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>高等数学（上）期中试卷</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body {
+    font-family: "Songti SC", "SimSun", "Microsoft YaHei", serif;
+    font-size: 11.5pt;
+    line-height: 1.75;
+    color: #000;
+    margin: 0;
+  }
+  h1 { font-size: 17pt; text-align: center; margin: 0 0 4px; letter-spacing: 2px; }
+  .sub { text-align: center; font-size: 10pt; color: #333; margin-bottom: 14px; }
+  .meta { display: flex; justify-content: space-between; font-size: 10pt; border-bottom: 1px solid #000; padding-bottom: 6px; margin-bottom: 14px; }
+  h2 { font-size: 12pt; margin: 16px 0 6px; }
+  p { margin: 0 0 8px; text-align: justify; }
+  .opts { margin-left: 1.5em; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10.5pt; }
+  th, td { border: 1px solid #333; padding: 5px 8px; text-align: center; }
+  th { background: #f0f0f0; }
+  .footer { margin-top: 18px; border-top: 1px dashed #888; padding-top: 6px; font-size: 9pt; color: #444; text-align: center; }
+</style>
+</head>
+<body>
+<h1>高等数学（上）期中试卷</h1>
+<div class="sub">东莞理工学院 · 2026—2027 学年第一学期</div>
+<div class="meta"><span>专业班级：____________</span><span>姓名：____________</span><span>学号：____________</span><span>得分：______</span></div>
+
+<h2>一、单项选择题（每小题 4 分，共 20 分）</h2>
+<p>1. 设函数 $f(x)=x^{2}+1$，则其导函数 $f'(x)$ 为（　　）</p>
+<div class="opts"><p>A. $2x$　　　B. $x^{2}$　　　C. $2x+1$　　　D. $\dfrac{x^{3}}{3}$</p></div>
+
+<p>2. 下列极限中，正确的是（　　）</p>
+<div class="opts"><p>A. $\lim\limits_{x \to 0}\dfrac{\sin x}{x}=0$　　B. $\lim\limits_{x \to 0}\dfrac{\sin x}{x}=1$　　C. $\lim\limits_{x \to \infty}\left(1+\dfrac{1}{x}\right)^{x}=1$　　D. $\lim\limits_{x \to 0}\dfrac{\mathrm{e}^{x}-1}{x}=0$</p></div>
+
+<p>3. 设 $z=x^{2}y+\sin(xy)$，则 $\dfrac{\partial z}{\partial x}$ 等于（　　）</p>
+<div class="opts"><p>A. $2xy+y\cos(xy)$　　　B. $x^{2}+x\cos(xy)$　　　C. $2xy+\cos(xy)$　　　D. $x^{2}y\cos(xy)$</p></div>
+
+<h2>二、计算题（每小题 10 分，共 40 分）</h2>
+<p>4. 计算定积分：</p>
+<p>$$\int_{0}^{1}\frac{1}{1+x^{2}}\,\mathrm{d}x=\frac{\pi}{4}$$</p>
+
+<p>5. 计算下列二重积分：</p>
+<p>$$\iint_{D} xy \,\mathrm{d}x\mathrm{d}y,\quad D=\left\{(x,y)\mid 0\le x\le 1,\ 0\le y\le x\right\}$$</p>
+
+<p>6. 求微分方程的通解：</p>
+<p>$$\frac{\mathrm{d}y}{\mathrm{d}x}+2y=3\mathrm{e}^{-x}$$</p>
+
+<p>7. 将函数展开为幂级数：</p>
+<p>$$f(x)=\frac{1}{1+x}=\sum_{n=0}^{\infty}(-1)^{n}x^{n},\quad |x|<1$$</p>
+
+<h2>三、证明题（10 分）</h2>
+<p>8. 证明：若函数 $f(x)$ 在 $[a,b]$ 上连续，且 $f(a)f(b)<0$，则存在 $\xi \in (a,b)$，使得 $f(\xi)=0$。</p>
+
+<h2>四、附：常用公式对照表</h2>
+<table>
+  <tr><th>名称</th><th>表达式</th><th>条件</th></tr>
+  <tr><td>麦克劳林级数</td><td>$e^{x}=\sum\limits_{n=0}^{\infty}\frac{x^{n}}{n!}$</td><td>$|x|&lt;\infty$</td></tr>
+  <tr><td>高斯型函数</td><td>$g(x)=e^{-x^{2}}$</td><td>$x \in \mathbb{R}$</td></tr>
+  <tr><td>欧拉公式</td><td>$e^{i\theta}=\cos\theta+i\sin\theta$</td><td>$\theta \in \mathbb{R}$</td></tr>
+  <tr><td>斯特林公式</td><td>$n! \approx \sqrt{2\pi n}\left(\frac{n}{e}\right)^{n}$</td><td>$n \to \infty$</td></tr>
+</table>
+
+<div class="footer">公式觉醒工作台 · 真实调用测试样本</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false }
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>
