@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>公式觉醒工作台 · Formula Awakening Workbench</title>
+<meta name="description" content="用 TextIn xParse 唤醒沉睡在 PDF 里的公式：解析文档、提取 LaTeX 公式、一键送入可视化编辑器，导出可直接粘贴进 Word 的 MathML。">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script defer src="vendor/katex/katex.min.js"></script>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<!-- ================= 顶栏 ================= -->
+<header class="topbar">
+  <div class="topbar__brand">
+    <span class="topbar__logo">∫</span>
+    <div class="topbar__titles">
+      <h1>公式觉醒工作台</h1>
+      <p>Formula Awakening · Powered by TextIn xParse</p>
+    </div>
+  </div>
+
+  <div class="topbar__right">
+    <span class="chip" id="keyChip" data-state="off">
+      <i class="dot"></i><span id="keyChipText">未配置 API Key</span>
+    </span>
+    <button class="btn btn--ghost" id="btnProof">调用凭证</button>
+    <button class="btn btn--ghost" id="btnSettings">API 设置</button>
+  </div>
+</header>
+
+<!-- ================= 指标条 ================= -->
+<section class="metrics" id="metrics">
+  <div class="metric"><span class="metric__num" id="mPages">—</span><span class="metric__label">解析页数</span></div>
+  <div class="metric"><span class="metric__num metric__num--accent" id="mFormulas">—</span><span class="metric__label">唤醒公式</span></div>
+  <div class="metric"><span class="metric__num" id="mDisplay">—</span><span class="metric__label">独立公式</span></div>
+  <div class="metric"><span class="metric__num" id="mInline">—</span><span class="metric__label">行内公式</span></div>
+  <div class="metric"><span class="metric__num" id="mTable">—</span><span class="metric__label">表格内公式</span></div>
+  <div class="metric"><span class="metric__num" id="mCost">—</span><span class="metric__label">解析耗时</span></div>
+</section>
+
+<!-- ================= 工作区 ================= -->
+<main class="workspace">
+
+  <!-- 左：文档来源 -->
+  <section class="col col--source">
+    <div class="card">
+      <div class="card__head">
+        <h2>1 · 放进来</h2>
+        <span class="hint">支持 PDF / 图片 / Word / PPT / Excel</span>
+      </div>
+
+      <label class="dropzone" id="dropzone">
+        <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg,.bmp,.tiff,.webp,.doc,.docx,.html,.mhtml,.xls,.xlsx,.csv,.ppt,.pptx,.txt,.ofd,.rtf" hidden>
+        <span class="dropzone__icon">⇪</span>
+        <span class="dropzone__text" id="dropzoneText">拖入一份含公式的文档，或点击选择</span>
+        <span class="dropzone__sub">试卷 / 教材 / 论文 / 讲义都可以</span>
+      </label>
+
+      <div class="filecard" id="fileCard" hidden>
+        <div class="filecard__name" id="fileName"></div>
+        <div class="filecard__meta" id="fileMeta"></div>
+        <div class="progress" id="progress" hidden><div class="progress__bar" id="progressBar"></div></div>
+        <button class="btn btn--primary btn--block" id="btnParse">开始解析并唤醒公式</button>
+      </div>
+
+      <div class="alert" id="alertBox" hidden></div>
+    </div>
+
+    <div class="card card--soft" id="docInfoCard" hidden>
+      <div class="card__head"><h2>解析报告</h2></div>
+      <dl class="kv" id="docInfo"></dl>
+    </div>
+
+    <div class="card card--soft">
+      <div class="card__head"><h2>为什么需要它</h2></div>
+      <p class="prose">
+        公式一旦被打印成 PDF 或扫描成图片，就变成了"死的像素"。想改一个下标、复制一条定理，
+        只能靠肉眼重敲一遍 LaTeX —— 一道大题十几分钟。
+      </p>
+      <p class="prose">
+        这个工作台把这一步交给 TextIn xParse：它读得懂版式、读得懂行内公式、读得懂表格里的公式，
+        并把每一条公式连同<strong>页码与坐标</strong>一起交还给你。公式就此"觉醒"成可编辑的 LaTeX。
+      </p>
+    </div>
+  </section>
+
+  <!-- 中：解析结果 -->
+  <section class="col col--result">
+    <div class="card card--flush">
+      <div class="tabs" id="resultTabs">
+        <button class="tab is-active" data-view="formulas">公式清单 <b id="tabCount">0</b></button>
+        <button class="tab" data-view="markdown">全文 Markdown</button>
+        <button class="tab" data-view="elements">结构树</button>
+      </div>
+
+      <div class="tabpane is-active" id="pane-formulas">
+        <div class="toolbar">
+          <input type="search" id="formulaFilter" placeholder="筛选公式，如 \frac、\int、积分、矩阵…" autocomplete="off">
+          <select id="formulaSource">
+            <option value="all">全部来源</option>
+            <option value="display">独立公式</option>
+            <option value="inline">行内公式</option>
+            <option value="table">表格内公式</option>
+          </select>
+          <button class="btn btn--ghost" id="btnExportAll">导出全部 LaTeX</button>
+        </div>
+        <div class="formula-list" id="formulaList">
+          <div class="empty" id="formulaEmpty">
+            <div class="empty__art">∑</div>
+            <h3>还没有公式被唤醒</h3>
+            <p>在左侧上传一份含公式的文档，工作台会调用 TextIn xParse 把公式逐条取出来。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabpane" id="pane-markdown">
+        <div class="markdown" id="markdownBody">
+          <div class="empty"><p>解析完成后，这里显示 TextIn xParse 返回的 Markdown 全文。</p></div>
+        </div>
+      </div>
+
+      <div class="tabpane" id="pane-elements">
+        <div class="element-tree" id="elementTree">
+          <div class="empty"><p>解析完成后，这里按页展示带页码与坐标的文档元素。</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 右：编辑器 -->
+  <section class="col col--editor">
+    <div class="card card--flush editor">
+      <div class="card__head">
+        <h2>2 · 改一改</h2>
+        <span class="hint" id="editorOrigin">未选择公式</span>
+      </div>
+
+      <div class="mathtool" id="mathTool"></div>
+
+      <textarea class="latex-input" id="latexInput" spellcheck="false"
+        placeholder="点左侧任意公式的「编辑」，或直接在这里敲 LaTeX，例如&#10;\frac{\partial^{2} u}{\partial x^{2}} = \frac{1}{c^{2}}\frac{\partial^{2} u}{\partial t^{2}}"></textarea>
+
+      <div class="preview">
+        <div class="preview__label">实时预览（KaTeX）</div>
+        <div class="preview__body" id="latexPreview">
+          <span class="preview__placeholder">公式会在这里渲染</span>
+        </div>
+      </div>
+
+      <div class="editor__actions">
+        <button class="btn btn--primary" id="btnCopyLatex">复制 LaTeX</button>
+        <button class="btn btn--ghost" id="btnCopyMathml">复制 MathML</button>
+        <button class="btn btn--ghost" id="btnCopyWord">复制到 Word</button>
+        <button class="btn btn--ghost" id="btnSaveLib">存入公式本</button>
+      </div>
+
+      <div class="lib">
+        <div class="lib__head">
+          <h3>我的公式本</h3>
+          <button class="btn btn--tiny" id="btnClearLib">清空</button>
+        </div>
+        <div class="lib__list" id="libList">
+          <span class="lib__empty">还没有收藏的公式</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>公式觉醒工作台 · 文档解析由 <strong>TextIn xParse</strong> 提供 · 公式渲染由 KaTeX 提供 · 前端零依赖部署</p>
+  <p class="footer__sub">提交赛道：实用价值赛道 · 作者：肖泽奇</p>
+</footer>
+
+<!-- ================= 设置弹层 ================= -->
+<div class="modal" id="settingsModal" hidden>
+  <div class="modal__panel">
+    <div class="modal__head">
+      <h2>连接 TextIn xParse</h2>
+      <button class="modal__close" data-close="settingsModal">×</button>
+    </div>
+    <div class="modal__body">
+      <p class="prose">
+        前往 <a href="https://www.textin.com/console/dashboard/setting" target="_blank" rel="noopener">TextIn 工作台 → 账号与开发者信息</a>
+        复制 <code>x-ti-app-id</code> 与 <code>x-ti-secret-code</code>。密钥仅保存在本机浏览器，不会上传到任何地方。
+      </p>
+      <label class="field"><span>app_id</span><input type="text" id="inAppId" autocomplete="off" placeholder="例如 20250101123456789"></label>
+      <label class="field"><span>secret_code</span><input type="password" id="inSecret" autocomplete="off" placeholder="粘贴 secret_code"></label>
+      <div class="modal__actions">
+        <button class="btn btn--primary" id="btnSaveKey">保存并测试连接</button>
+        <button class="btn btn--ghost" id="btnClearKey">清除密钥</button>
+      </div>
+      <div class="alert" id="keyAlert" hidden></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 凭证弹层 ================= -->
+<div class="modal" id="proofModal" hidden>
+  <div class="modal__panel modal__panel--wide">
+    <div class="modal__head">
+      <h2>TextIn xParse 调用凭证</h2>
+      <button class="modal__close" data-close="proofModal">×</button>
+    </div>
+    <div class="modal__body">
+      <p class="prose">每成功解析一次，工作台都会把 TextIn 返回的 <code>file_id</code>、<code>job_id</code>、<code>success_count</code>、<code>x_request_id</code> 以及请求参数原样记账，可导出为 JSON 作为作品有效调用的证明。</p>
+      <div class="proof-list" id="proofList"><span class="lib__empty">暂无调用记录</span></div>
+      <div class="modal__actions">
+        <button class="btn btn--primary" id="btnExportProof">导出凭证 JSON</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastText">已复制</span></div>
+
+<!-- ================= 脚本 ================= -->
+<script src="js/core.js"></script>
+<script src="js/xparse.js"></script>
+<script src="js/formulas.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
