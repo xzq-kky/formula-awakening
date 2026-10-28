@@ -8,6 +8,13 @@
 <link rel="stylesheet" href="vendor/katex/katex.min.css">
 <script defer src="vendor/katex/katex.min.js"></script>
 <link rel="stylesheet" href="css/app.css">
+<script>
+  /* 首屏前先套用上次选择的主题，避免深色→浅色闪一下 */
+  try {
+    var savedTheme = JSON.parse(localStorage.getItem('fa_theme_v1'));
+    if (savedTheme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+  } catch (e) { /* 忽略 */ }
+</script>
 </head>
 <body>
 
@@ -25,6 +32,15 @@
     <span class="chip" id="keyChip" data-state="off">
       <i class="dot"></i><span id="keyChipText">未配置 API Key</span>
     </span>
+    <button class="btn btn--ghost btn--icon" id="btnTheme" title="切换浅色模式" aria-label="切换到浅色模式" aria-pressed="false">
+      <svg class="ico ico--sun" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.2"/>
+        <path d="M12 2.6v2.4M12 19v2.4M2.6 12h2.4M19 12h2.4M5.4 5.4l1.7 1.7M16.9 16.9l1.7 1.7M18.6 5.4l-1.7 1.7M7.1 16.9l-1.7 1.7"/>
+      </svg>
+      <svg class="ico ico--moon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20.2 14.4A8.3 8.3 0 1 1 9.6 3.8a6.6 6.6 0 0 0 10.6 10.6z"/>
+      </svg>
+    </button>
     <button class="btn btn--ghost" id="btnProof">调用凭证</button>
     <button class="btn btn--ghost" id="btnSettings">API 设置</button>
   </div>
