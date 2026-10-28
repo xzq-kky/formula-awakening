@@ -28,6 +28,7 @@ window.FA = window.FA || {};
       progress: document.getElementById('progress'),
       progressBar: document.getElementById('progressBar'),
       btnParse: document.getElementById('btnParse'),
+      btnDemo: document.getElementById('btnDemo'),
       keyChip: document.getElementById('keyChip'),
       keyChipText: document.getElementById('keyChipText'),
       tabs: document.getElementById('resultTabs')
@@ -79,6 +80,57 @@ window.FA = window.FA || {};
     });
 
     el.btnParse.addEventListener('click', startParse);
+    el.btnDemo.addEventListener('click', loadDemo);
+  }
+
+  /* ---------------- 示例结果（无需 API Key） ---------------- */
+  function loadDemo() {
+    if (el.btnDemo.disabled) return;
+    el.btnDemo.disabled = true;
+    el.btnDemo.textContent = '正在载入示例…';
+
+    fetch('samples/xparse-result.json').then(function (res) {
+      if (!res.ok) throw new Error('示例文件读取失败（HTTP ' + res.status + '）');
+      return res.json();
+    }).then(function (json) {
+      if (!json || json.code !== 200 || !json.data) throw new Error('示例数据格式不正确');
+
+      var meta = json.data.metadata || {};
+      var result = {
+        data: json.data,
+        elapsedMs: null,
+        requestId: json.x_request_id || '',
+        endpoint: FA.xparse.ENDPOINT,
+        requestConfig: null,
+        finishedAt: null
+      };
+      var file = {
+        name: meta.filename || '高等数学-期中试卷.pdf',
+        size: 72052
+      };
+
+      var analysis = FA.formulas.analyze(json.data);
+      app.result = result;
+      app.analysis = analysis;
+      app.file = file;
+
+      FA.ui.renderMetrics(analysis.stats, null);
+      FA.ui.renderDocInfo(result, file);
+      FA.ui.renderFormulaList(analysis.items);
+      FA.ui.renderMarkdown(analysis.markdown);
+      FA.ui.renderElementTree(analysis.elements);
+
+      if (analysis.items.length) FA.editor.load(analysis.items[0]);
+
+      FA.ui.showAlert('ok', '这是内置示例：一份真实调用 TextIn xParse 解析过的两页《高等数学》期中试卷，' +
+        '共唤醒 ' + analysis.items.length + ' 条公式。所有数据来自真实接口响应，未做任何改写；' +
+        '配置自己的 API Key 后即可解析你自己的文档。');
+    }).catch(function (err) {
+      FA.ui.showAlert('error', '示例数据加载失败：' + FA.escapeHtml(err.message || '未知错误'));
+    }).then(function () {
+      el.btnDemo.disabled = false;
+      el.btnDemo.textContent = '载入示例结果（无需 API Key）';
+    });
   }
 
   function acceptFile(file) {
