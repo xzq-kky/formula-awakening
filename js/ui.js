@@ -8,7 +8,7 @@ window.FA = window.FA || {};
   'use strict';
 
   var el = {};
-  var cache = { items: [], filter: '', source: 'all' };
+  var cache = { items: [], filter: '', source: 'all', currentIndex: null };
 
   function init() {
     el.list = document.getElementById('formulaList');
@@ -109,6 +109,7 @@ window.FA = window.FA || {};
   function buildCard(it) {
     var card = document.createElement('div');
     card.className = 'fitem';
+    if (cache.currentIndex === it.index) card.classList.add('is-current');
     card.dataset.index = it.index;
 
     var tags = '<span class="fitem__tag fitem__tag--' + it.source + '">' +
@@ -130,7 +131,13 @@ window.FA = window.FA || {};
 
     card.querySelector('[data-act="edit"]').addEventListener('click', function () {
       FA.editor.load(it);
+      markCurrent(it.index);
       FA.toast('已载入编辑器');
+      /* 窄屏下编辑器在下方，直接把视图带过去，省掉一次手动滚动 */
+      if (window.innerWidth <= 1280) {
+        var editorCol = document.querySelector('.col--editor');
+        if (editorCol) editorCol.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     });
 
     card.querySelector('[data-act="copy"]').addEventListener('click', function () {
@@ -144,6 +151,14 @@ window.FA = window.FA || {};
 
   function setFilter(value) { cache.filter = value; drawList(); }
   function setSource(value) { cache.source = value; drawList(); }
+
+  /* 标记当前已载入编辑器的公式，滚动列表时也能看出改的是哪一条 */
+  function markCurrent(index) {
+    cache.currentIndex = index;
+    Array.prototype.forEach.call(el.list.querySelectorAll('.fitem'), function (node) {
+      node.classList.toggle('is-current', Number(node.dataset.index) === index);
+    });
+  }
 
   /* ---------------- Markdown ---------------- */
   function renderMarkdown(md) {
@@ -222,6 +237,7 @@ window.FA = window.FA || {};
     resetMetrics: resetMetrics,
     renderDocInfo: renderDocInfo,
     renderFormulaList: renderFormulaList,
+    markCurrent: markCurrent,
     setFilter: setFilter,
     setSource: setSource,
     renderMarkdown: renderMarkdown,
